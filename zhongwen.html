@@ -406,12 +406,14 @@ async function fetchHanziDetails(hanzi) {
         'https://api.codetabs.com/v1/proxy?quest='
     ];
     
-    const apiUrl = `https://hanyuapp.baidu.com/dictapp/word/detail_getworddetail?wd=${encodeURIComponent(hanzi)}&client=pc&lesson_from=xiaodu&smp_names=wordNewData1`;
+    const apiUrl = `/.netlify/functions/hanzi-proxy?wd=${encodeURIComponent(hanzi)}`
+    // `https://hanyuapp.baidu.com/dictapp/word/detail_getworddetail?wd=${encodeURIComponent(hanzi)}&client=pc&lesson_from=xiaodu&smp_names=wordNewData1`;
     
     for (const proxyUrl of proxyUrls) {
-        console.log('begin', proxyUrl);
+        //console.log('begin', proxyUrl);
         try {
-            const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
+            //const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
+            const response = await fetch(apiUrl, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -438,7 +440,7 @@ async function fetchHanziDetails(hanzi) {
         }
     }
     
-    throw new Error('所有CORS代理都失败');
+    throw new Error('所有代理都失败');
 }
             // 显示查询结果
             function displayResults(characters, results) {
