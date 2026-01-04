@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汉字笔顺与发音查询工具</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .input-group {
+            display: flex;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 15px;
+        }
+        
+        #chinese-input {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: 8px 0 0 8px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        #chinese-input:focus {
+            border-color: #3498db;
+        }
+        
+        #submit-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0 30px;
+            font-size: 1.1rem;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        #submit-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .char-count {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            background-color: #fadbd8;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-left-color: #3498db;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .results-section {
+            margin-top: 20px;
+        }
+        
+        .results-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .characters-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .character-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 180px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .character-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .char-display {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gif-container {
+            height: 120px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .stroke-gif {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .play-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .play-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .play-btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .no-data {
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .instructions {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        @media (max-width: 768px) {
+            .character-card {
+                width: 150px;
+            }
+            
+            .char-display {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            #chinese-input, #submit-btn {
+                width: 100%;
+                border-radius: 8px;
+                margin-bottom: 10px;
+            }
+            
+            .character-card {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>汉字笔顺与发音查询工具</h1>
+            <p class="subtitle">输入中文文本，查看每个汉字的笔顺动画和发音</p>
+        </header>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="chinese-input" placeholder="请输入中文文本（最多10个字）" maxlength="10">
+                <button id="submit-btn">查询汉字</button>
+            </div>
+            <p class="char-count">已输入 <span id="char-counter">0</span>/10 个字符</p>
+            <div class="error-message" id="error-message"></div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在查询汉字数据，请稍候...</p>
+        </div>
+        
+        <div class="results-section" id="results-section">
+            <h2 class="results-title" id="results-title"></h2>
+            <div class="characters-container" id="characters-container">
+                <p class="no-data">请输入中文文本并点击"查询汉字"按钮</p>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>使用说明</h3>
+            <p>1. 在输入框中输入中文文本（最多10个汉字）</p>
+            <p>2. 点击"查询汉字"按钮，系统将获取每个汉字的笔顺动画和发音</p>
+            <p>3. 每个汉字卡片会显示笔顺动画GIF，点击"播放发音"按钮可听到该汉字的读音</p>
+            <p>4. 如果某个汉字没有查询到数据，会显示"暂无数据"</p>
+        </div>
+        
+        <footer>
+            <p>本工具使用百度汉语API获取汉字笔顺动画和发音数据</p>
+            <p>© 2025 汉字查询工具 | 仅供学习使用</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chineseInput = document.getElementById('chinese-input');
+            const submitBtn = document.getElementById('submit-btn');
+            const charCounter = document.getElementById('char-counter');
+            const errorMessage = document.getElementById('error-message');
+            const loading = document.getElementById('loading');
+            const resultsSection = document.getElementById('results-section');
+            const resultsTitle = document.getElementById('results-title');
+            const charactersContainer = document.getElementById('characters-container');
+            
+            // 更新字符计数器
+            chineseInput.addEventListener('input', function() {
+                const count = this.value.length;
+                charCounter.textContent = count;
+                
+                if (count > 10) {
+                    this.value = this.value.substring(0, 10);
+                }
+            });
+            
+            // 提交查询
+            submitBtn.addEventListener('click', fetchHanziData);
+            
+            // 允许按Enter键提交
+            chineseInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    fetchHanziData();
+                }
+            });
+            
+            // 查询汉字数据
+            async function fetchHanziData() {
+                const text = chineseInput.value.trim();
+                
+                // 验证输入
+                if (!text) {
+                    showError('请输入中文文本');
+                    return;
+                }
+                
+                // 验证是否为中文
+                const chineseRegex = /^[\u4e00-\u9fa5]+$/;
+                if (!chineseRegex.test(text)) {
+                    showError('请输入有效的中文字符');
+                    return;
+                }
+                
+                // 清空错误消息和之前的结果
+                hideError();
+                charactersContainer.innerHTML = '';
+                resultsTitle.textContent = '';
+                
+                // 显示加载动画
+                loading.style.display = 'block';
+                
+                try {
+                    // 将文本拆分为单个字符
+                    const characters = text.split('');
+                    
+                    // 为每个汉字创建查询
+                    const promises = characters.map(char => {
+                        return fetchHanziDetails(char);
+                    });
+                    
+                    // 等待所有查询完成
+                    const results = await Promise.all(promises);
+                    
+                    // 隐藏加载动画
+                    loading.style.display = 'none';
+                    
+                    // 显示结果
+                    displayResults(characters, results);
+                    
+                } catch (error) {
+                    console.error('查询失败:', error);
+                    loading.style.display = 'none';
+                    showError('查询失败，请稍后重试');
+                }
+            }
+
+            // 获取单个汉字的详细信息 - 完整解决方案
+async function fetchHanziDetails(hanzi) {
+    const proxyUrls = [
+        'https://api.codetabs.com/v1/proxy?quest='
+    ];
+    
+    const apiUrl = `/.netlify/functions/hanzi-proxy?wd=${encodeURIComponent(hanzi)}`
+    // `https://hanyuapp.baidu.com/dictapp/word/detail_getworddetail?wd=${encodeURIComponent(hanzi)}&client=pc&lesson_from=xiaodu&smp_names=wordNewData1`;
+    
+    for (const proxyUrl of proxyUrls) {
+        //console.log('begin', proxyUrl);
+        try {
+            //const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
+            const response = await fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                },
+                timeout: 1000
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data && data.data && data.data.detail) {
+                    const detail = data.data.detail;
+                    console.log('获取到汉字数据:', detail.strokeOrderGif, detail.pinyinList[0].voice);
+                    return {
+                        strokeOrderGif: detail.strokeOrderGif || null,
+                        voice: detail.pinyinList[0].voice || null,
+                        success: true
+                    };
+                }
+            }
+        } catch (error) {
+            console.log('error: ' + proxyUrl);
+            continue; // 尝试下一个代理
+        }
+    }
+    
+    throw new Error('所有代理都失败');
+}
+            // 显示查询结果
+            function displayResults(characters, results) {
+                // 更新标题
+                resultsTitle.textContent = `查询结果 (${characters.length}个汉字)`;
+                
+                if (characters.length === 0) {
+                    charactersContainer.innerHTML = '<p class="no-data">没有找到任何汉字</p>';
+                    return;
+                }
+                
+                // 创建每个汉字的卡片
+                characters.forEach((char, index) => {
+                    const result = results[index];
+                    
+                    const card = document.createElement('div');
+                    card.className = 'character-card';
+                    
+                    // 汉字显示
+                    const charDisplay = document.createElement('div');
+                    charDisplay.className = 'char-display';
+                    charDisplay.textContent = char;
+                    
+                    // GIF容器
+                    const gifContainer = document.createElement('div');
+                    gifContainer.className = 'gif-container';
+                    
+                    if (result && result.success && result.strokeOrderGif) {
+                        const gifImg = document.createElement('img');
+                        gifImg.className = 'stroke-gif';
+                        gifImg.src = result.strokeOrderGif;
+                        gifImg.alt = `${char}笔顺动画`;
+                        gifContainer.appendChild(gifImg);
+                    } else {
+                        gifContainer.innerHTML = '<p style="color: #95a5a6;">暂无笔顺动画</p>';
+                    }
+                    
+                    // 播放按钮
+                    const playBtn = document.createElement('button');
+                    playBtn.className = 'play-btn';
+                    playBtn.innerHTML = '<span>▶</span> 播放发音';
+                    
+                    if (result && result.success && result.voice) {
+                        playBtn.onclick = function() {
+                            playAudio(result.voice);
+                        };
+                    } else {
+                        playBtn.disabled = true;
+                        playBtn.textContent = '暂无发音';
+                    }
+                    
+                    // 组装卡片
+                    card.appendChild(charDisplay);
+                    card.appendChild(gifContainer);
+                    card.appendChild(playBtn);
+                    
+                    charactersContainer.appendChild(card);
+                });
+            }
+            
+            // 播放音频
+            function playAudio(audioUrl) {
+                const audio = new Audio(audioUrl);
+                audio.play().catch(e => {
+                    console.error('播放音频失败:', e);
+                    showError('播放音频失败，请检查音频链接');
+                });
+            }
+            
+            // 显示错误消息
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+            
+            // 隐藏错误消息
+            function hideError() {
+                errorMessage.style.display = 'none';
+            }
+            
+            // 示例：预加载一些汉字
+            window.addEventListener('load', function() {
+                chineseInput.value = '汉字学习';
+                charCounter.textContent = 4;
+            });
+        });
+    </script>
+</body>
+</html>

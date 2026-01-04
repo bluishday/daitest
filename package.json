@@ -1,0 +1,17 @@
+{
+  "name": "hanzi-query-tool",
+  "version": "1.0.0",
+  "description": "汉字笔顺与发音查询工具",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build needed'"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {},
+  "keywords": ["hanzi", "chinese", "stroke-order", "pronunciation"],
+  "author": "bluish day",
+  "license": "MIT"
+}
