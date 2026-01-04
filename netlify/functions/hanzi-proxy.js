@@ -70,7 +70,12 @@ exports.handler = async function(event, context) {
       headers,
       body: JSON.stringify({
         success: true,
-        data: data.data,
+        data: {
+           detail: {
+            strokeOrderGif: data.data.detail.strokeOrderGif || null,
+            pinyinList: data.data.detail.pinyinList || [] 
+           }
+        }, // data.data,
         source: 'baidu-hanyu-api',
         character: wd
       })

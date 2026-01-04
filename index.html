@@ -426,10 +426,11 @@ async function fetchHanziDetails(hanzi) {
                 const data = await response.json();
                 if (data && data.data && data.data.detail) {
                     const detail = data.data.detail;
-                    console.log('获取到汉字数据:', detail.strokeOrderGif, detail.pinyinList[0].voice);
+                    //console.log('获取到汉字数据:', detail.strokeOrderGif, detail.pinyinList[0].voice);
                     return {
                         strokeOrderGif: detail.strokeOrderGif || null,
                         voice: detail.pinyinList[0].voice || null,
+                        py: detail.pinyinList[0].name || null,
                         success: true
                     };
                 }
@@ -462,7 +463,7 @@ async function fetchHanziDetails(hanzi) {
                     // 汉字显示
                     const charDisplay = document.createElement('div');
                     charDisplay.className = 'char-display';
-                    charDisplay.textContent = char;
+                    charDisplay.textContent = result.py;
                     
                     // GIF容器
                     const gifContainer = document.createElement('div');
