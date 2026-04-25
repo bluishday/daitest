@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>📖 一年级生字卡片 · 快乐学汉字</title>
     <style>
+        /* 引入国内网络楷体字体 */
+        @font-face {
+            font-family: 'NetKaiTi';
+            src: url('https://lf3-cdn-tos.bytescm.com/obj/static/xitu_juejin_web/fonts/KaiTi.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -70,7 +77,7 @@
         .hanzi {
             font-size: 16rem;
             font-weight: 700;
-            font-family: '华文楷书', 'KaiTi', '楷体', 'Microsoft YaHei', cursive;
+            font-family: 'NetKaiTi', '楷体', 'KaiTi', '华文楷书', 'Microsoft YaHei', cursive;
             color: #2e4e3e;
             text-shadow: 6px 6px 16px rgba(0,0,0,0.08);
             letter-spacing: 8px;
