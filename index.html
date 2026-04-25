@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>📖 一年级生字卡片 · 快乐学汉字</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* 避免儿童拖动时选中文字，提升卡片触感 */
+        }
+
+        body {
+            background: linear-gradient(145deg, #f9e7b3 0%, #f5cf8c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Roboto', 'Comic Neue', 'Apple Color Emoji', 'PingFang SC', sans-serif;
+            padding: 24px;
+        }
+
+        /* 主卡片面板 — 更大更宽敞 */
+        .card-container {
+            max-width: 960px;
+            width: 100%;
+            background: rgba(255, 250, 225, 0.92);
+            border-radius: 80px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 245, 190, 0.7) inset;
+            backdrop-filter: blur(3px);
+            padding: 32px 28px 36px 28px;
+            transition: all 0.2s ease;
+        }
+
+        /* 识字卡片主体 (大卡片) — 字号更大，内边距更足 */
+        .flashcard {
+            background: #fffef7;
+            border-radius: 64px;
+            box-shadow: 0 24px 40px -12px rgba(0, 0, 0, 0.25), 0 6px 12px rgba(0, 0, 0, 0.05);
+            padding: 56px 32px 64px 32px;
+            margin-bottom: 32px;
+            text-align: center;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border: 3px solid #ffde9e;
+            cursor: pointer;
+        }
+
+        /* 拼音区域 — 字号提升，永远占位（通过 visibility 控制显隐，布局不跳动） */
+        .pinyin {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #c26b2e;
+            background: #fff3e0;
+            display: inline-block;
+            padding: 12px 32px;
+            border-radius: 80px;
+            margin-bottom: 23px;
+            font-family: 'Segoe UI', 'Roboto', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.02), 0 4px 8px rgba(0,0,0,0.03);
+            /* 关键：始终保持块级占位，visibility 控制可见性不影响布局尺寸 */
+            visibility: visible;
+            min-width: 140px;
+            line-height: 1.2;
+        }
+
+        /* 汉字区域 — 更大更醒目 (楷体气质) */
+        .hanzi {
+            font-size: 15rem;
+            font-weight: 700;
+            font-family: '华文楷书', 'KaiTi', '楷体', 'Microsoft YaHei', cursive;
+            color: #2e4e3e;
+            text-shadow: 6px 6px 16px rgba(0,0,0,0.08);
+            letter-spacing: 8px;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        /* 卡片序号信息 — 更圆润 */
+        .counter-info {
+            text-align: center;
+            font-size: 1.3rem;
+            background: #f7e9cd;
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 60px;
+            margin-top: 8px;
+            margin-bottom: 22px;
+            color: #ad6b35;
+            font-weight: bold;
+            font-family: monospace;
+            letter-spacing: 1px;
+            box-shadow: inset 0 1px 3px #fffaec, 0 3px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .counter-wrapper {
+            text-align: center;
+        }
+
+        /* 按钮组：间距舒适，尺寸更大 */
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0 25px 0;
+        }
+
+        .btn {
+            background: #ffeaac;
+            border: none;
+            font-size: 1.35rem;
+            font-weight: bold;
+            padding: 14px 32px;
+            border-radius: 60px;
+            color: #5a3e1f;
+            font-family: inherit;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 0 #c29a6b;
+            transform: translateY(-2px);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #c29a6b;
+        }
+
+        .btn-primary {
+            background: #f3bc6c;
+            color: #3a280f;
+            box-shadow: 0 6px 0 #b4622a;
+        }
+
+        .btn-primary:active {
+            box-shadow: 0 2px 0 #b4622a;
+        }
+
+        .btn-special {
+            background: #cbd89e;
+            color: #2d4a2b;
+            box-shadow: 0 6px 0 #8b6b42;
+        }
+
+        /* 底部开关区域，更清晰 */
+        .setting-area {
+            background: #fff3e2;
+            border-radius: 56px;
+            padding: 18px 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+            border: 1px solid #ffe2b5;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #faeecb;
+            padding: 10px 28px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #6b3f1c;
+        }
+
+        .toggle-switch input {
+            width: 52px;
+            height: 28px;
+            appearance: none;
+            background: #d2b48c;
+            border-radius: 40px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch input:checked {
+            background: #f5a65b;
+        }
+
+        .toggle-switch input::before {
+            content: "";
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            transition: 0.2s;
+        }
+
+        .toggle-switch input:checked::before {
+            left: 24px;
+        }
+
+        .label-text {
+            font-size: 1.15rem;
+            font-weight: bold;
+        }
+
+        /* 大屏幕适配更舒展 */
+        @media (min-width: 1200px) {
+            .card-container {
+                max-width: 1050px;
+            }
+            .hanzi {
+                font-size: 15rem;
+            }
+            .pinyin {
+                font-size: 2rem;
+                padding: 14px 38px;
+            }
+            .flashcard {
+                padding: 68px 40px 76px 40px;
+            }
+        }
+
+        /* 移动端舒适缩放，但依然比原来大 */
+        @media (max-width: 650px) {
+            .card-container {
+                padding: 20px 16px;
+            }
+            .flashcard {
+                padding: 40px 20px 48px;
+            }
+            .hanzi {
+                font-size: 5.6rem;
+                letter-spacing: 4px;
+            }
+            .pinyin {
+                font-size: 2rem;
+                padding: 8px 20px;
+                margin-bottom: 20px;
+            }
+            .btn {
+                padding: 10px 22px;
+                font-size: 1.1rem;
+            }
+            .setting-area {
+                padding: 12px 16px;
+                gap: 16px;
+            }
+            .toggle-switch {
+                padding: 6px 18px;
+                gap: 10px;
+            }
+            .counter-info {
+                font-size: 1.1rem;
+                padding: 6px 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hanzi {
+                font-size: 4.8rem;
+            }
+            .pinyin {
+                font-size: 1.7rem;
+            }
+            .btn {
+                padding: 8px 16px;
+                font-size: 0.95rem;
+            }
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.8rem;
+            margin-top: 24px;
+            color: #b87a42;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card-container">
+    <!-- 大卡片区域 动态显示拼音+汉字 -->
+    <div class="flashcard" id="flashcard">
+        <div class="pinyin" id="pinyinText">shí</div>
+        <div class="hanzi" id="hanziText">识</div>
+    </div>
+
+    <!-- 卡片计数器 -->
+    <div class="counter-wrapper">
+        <div class="counter-info" id="counterInfo">第1张 / 共4张</div>
+    </div>
+
+    <!-- 按钮组 - 更加友好 -->
+    <div class="button-group">
+        <button class="btn" id="prevBtn">◀ 上一个</button>
+        <button class="btn btn-primary" id="resetBtn">✨ 重新开始</button>
+        <button class="btn" id="nextBtn">下一个 ▶</button>
+    </div>
+    <div class="button-group">
+        <button class="btn btn-special" id="pinyinToggleBtn">🔤 拼音显隐</button>
+    </div>
+
+    <!-- 底部开关区: 控制重新开始时是否打乱，不影响卡片布局 -->
+    <div class="setting-area">
+        <div class="toggle-switch">
+            <span class="label-text">🎲 是否打乱顺序</span>
+            <input type="checkbox" id="shuffleToggle" checked>
+        </div>
+        <div style="font-size:0.9rem; color:#a5622a; font-weight:500;">✨ 开关控制“重新开始”时的顺序，拼音显隐不跳屏</div>
+    </div>
+    <footer>⭐ 点击卡片也可以切换下一个字 | 拼音显隐保持占位无跳动 ~ 快乐识字</footer>
+</div>
+
+<script>
+    // ---------- 生字原始数据 (保留所有卡片，可自由增删) ----------
+    const hanziItems = [
+        { z: '识', p: 'shí' },
+        { z: '字', p: 'zì' },
+        { z: '卡', p: 'kǎ' },
+        { z: '片', p: 'piàn' },
+        { 'z': '一', 'p': 'yī', 'u': 'bb3e43bce24154e4ea04e1887c296d7b8' },
+        { 'z': '二', 'p': 'èr', 'u': 'b1fcc1334d1d043a5955ad19f0c949adb' },
+        { 'z': '三', 'p': 'sān', 'u': 'ba92147330f804f45980e304c4e70affc' },
+        { 'z': '上', 'p': 'shàng', 'u': 'b49b913d9427711e5bb35c8e0eb15ce01' },
+        { 'z': '下', 'p': 'xià', 'u': 'b0b717cdfabbd4cb887172b079730214a' },
+        { 'z': '口', 'p': 'kǒu', 'u': 'b4070ad1bbc9546f28de360553fa1f367' },
+        { 'z': '日', 'p': 'rì', 'u': 'b3df1066c58c24b1caf4903143e1da12d' },
+        { 'z': '目', 'p': 'mù', 'u': 'bf38af84dc9c148fab822ddae472e115d' },
+        { 'z': '耳', 'p': 'ěr', 'u': 'b830aa100d9aa4ecead16b1df89c8007d' },
+        { 'z': '手', 'p': 'shǒu', 'u': 'bab8c8885adbf4abeb5da2725a87c0cf4' },
+        { 'z': '头', 'p': 'tóu', 'u': 'b49ce52d7427711e5b0e5c8e0eb15ce01' }
+    ];
+    // 注意：未来只需要在上方数组里增删条目即可，所有逻辑自动适配总数
+
+    // ---------- 全局变量 ----------
+    let currentCards = [];           // 当前使用的卡片顺序 (对象数组)
+    let currentIndex = 0;           // 当前显示索引 (0-based)
+    let showPinyin = false;          // 拼音显隐状态 true=显示 false=隐藏（始终占位）
+
+    // DOM 元素
+    const pinyinEl = document.getElementById('pinyinText');
+    const hanziEl = document.getElementById('hanziText');
+    const counterInfo = document.getElementById('counterInfo');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const pinyinToggleBtn = document.getElementById('pinyinToggleBtn');
+    const shuffleToggleCheckbox = document.getElementById('shuffleToggle');
+
+    // ---------- 辅助函数 ----------
+    // 深拷贝原始数组 (对象独立)
+    function cloneOriginalItems() {
+        return hanziItems.map(item => ({ ...item }));
+    }
+
+    // Fisher-Yates 洗牌算法 (原地打乱数组)
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // 根据开关状态生成新的卡片顺序 
+    // isShuffle: true 打乱, false 按原始顺序
+    function generateCardsByShuffle(isShuffle) {
+        const cloned = cloneOriginalItems();      // 原始顺序拷贝
+        if (isShuffle) {
+            return shuffleArray(cloned);           // 随机打乱
+        }
+        return cloned;                             // 保持初始顺序
+    }
+
+    // 核心：重新开始 (按照当前开关状态重置卡片顺序，索引归零，并保持拼音显隐偏好)
+    function resetAndStart() {
+        const shouldShuffle = shuffleToggleCheckbox.checked;
+        currentCards = generateCardsByShuffle(shouldShuffle);
+        currentIndex = 0;
+        renderCurrentCard();   // 刷新界面（拼音显示状态由 showPinyin 决定）
+    }
+
+    // 渲染当前卡片：汉字 + 拼音 (拼音通过 visibility 控制显隐，绝不改变布局尺寸)
+    function renderCurrentCard() {
+        if (!currentCards.length) {
+            // 容错：极端情况重置
+            console.warn("currentCards 为空，重新初始化");
+            resetAndStart();
+            return;
+        }
+        const currentItem = currentCards[currentIndex];
+        if (!currentItem) {
+            // 防御: 索引越界归零
+            currentIndex = 0;
+            renderCurrentCard();
+            return;
+        }
+
+        // 更新汉字
+        hanziEl.textContent = currentItem.z;
+        // 拼音文本总是填充（为了占位内容一致，保持高度不变）
+        pinyinEl.textContent = currentItem.p;
+        // 关键：使用 visibility 控制显隐，始终占据原有空间，不会导致页面跳动
+        pinyinEl.style.visibility = showPinyin ? 'visible' : 'hidden';
+
+        // 更新计数器 (第x个/共N个)
+        const total = currentCards.length;
+        const currentNumber = currentIndex + 1;
+        counterInfo.textContent = `第${currentNumber}张 / 共${total}张`;
+    }
+
+    // 上一个 (循环)
+    function goPrev() {
+        if (currentCards.length === 0) return;
+        currentIndex = (currentIndex - 1 + currentCards.length) % currentCards.length;
+        renderCurrentCard();
+    }
+
+    // 下一个 (循环)
+    function goNext() {
+        if (currentCards.length === 0) return;
+        currentIndex = (currentIndex + 1) % currentCards.length;
+        renderCurrentCard();
+    }
+
+    // 拼音显隐切换 (布局不改变，无跳动)
+    function togglePinyinVisibility() {
+        showPinyin = !showPinyin;
+        // 直接重新渲染当前卡片，根据 showPinyin 更新 visibility，无任何尺寸变化
+        renderCurrentCard();
+        // 附加小优化: 给用户细微触感反馈（不改变布局，仅心理提示）
+        pinyinToggleBtn.style.transform = "scale(0.97)";
+        setTimeout(() => {
+            pinyinToggleBtn.style.transform = "";
+        }, 120);
+    }
+
+    // 点击卡片跳转到下一个 (儿童友好操作)
+    function attachCardClickNext() {
+        const card = document.getElementById('flashcard');
+        if (card) {
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                goNext();
+            });
+        }
+    }
+
+    // ---------- 页面初始化 & 事件绑定 ----------
+    function init() {
+        // 1. 根据默认开关状态 (打乱开关默认 true) 初始化卡片顺序 (随机顺序)
+        resetAndStart();
+
+        // 2. 绑定按钮事件
+        prevBtn.addEventListener('click', goPrev);
+        nextBtn.addEventListener('click', goNext);
+        resetBtn.addEventListener('click', () => {
+            resetAndStart();
+        });
+        pinyinToggleBtn.addEventListener('click', togglePinyinVisibility);
+
+        // 3. 开关本身只影响“重新开始”行为，但为了体验，在开关变化时不需要额外动作（完全符合需求）
+        // 额外说明：用户若想改变顺序，点“重新开始”即可基于当前开关打乱或回归原始
+
+        // 4. 点击卡片快速翻下一页
+        attachCardClickNext();
+
+        // 5. 确保拼音显隐在重置后依然保持之前的偏好 (showPinyin 变量无重置，renderCurrentCard 会应用)
+        // 并且所有场景不会出现布局跳动：因为拼音用 visibility 控制，占位完全相同。
+    }
+
+    // 启动应用
+    init();
+</script>
+</body>
+</html>
